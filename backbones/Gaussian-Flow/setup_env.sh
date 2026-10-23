@@ -7,9 +7,8 @@
 #   bash backbones/Gaussian-Flow/setup_env.sh
 #
 # Extensions:
-#   submodules/diff-gaussian-rasterization  stock Inria rasterizer, commit 59f5f77 (what the paper's
-#                                           runs used); its glm submodule is shared with the
-#                                           4DGaussians rasterizer in ../4DGaussians/submodules/
+#   submodules/diff-gaussian-rasterization  stock Inria rasterizer (commit 59f5f77); its glm headers
+#                                           are shared with the 4DGaussians rasterizer in ../4DGaussians/submodules/
 #   ../4DGaussians/submodules/simple-knn    same source as the 4DGaussians environment
 set -euo pipefail
 

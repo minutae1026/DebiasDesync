@@ -15,11 +15,16 @@
 
 We propose a simple method to balance the view coverage bias when reconstructing dynamic scenes from multiple desynchronized videos. When multiple videos of the same scene are captured from various views in the wild, they are often desynchronized: some start later, and some end earlier than the rest. In these cases, the amount of coverage a point in space and time has differs from one point to the other, leading to 4D representations focusing on one point over the other, especially prominent in dynamic parts of the scene where observations are limited. We thus propose to debias the training of 4D representations: (1) by sampling uniformly across modeled time, not across captured frames; and (2) by assigning higher weight to pixels with higher reconstruction error during training. We evaluate our method on the Plenoptic Video dataset by introducing random camera-specific time offsets of up to 100 frames, and show that, while simple, it enhances the reconstruction quality, especially in dynamic regions.
 
-This repository contains the training strategy applied to two backbones, [4DGaussians](https://github.com/hustvl/4DGaussians) and [Gaussian-Flow](https://github.com/Linyou/D3DGS), together with the scripts that build the desynchronized split and reproduce Table 1 of the paper.
+This repository provides:
+
+- Our training strategy on two backbones, [4DGaussians](https://github.com/hustvl/4DGaussians) and [Gaussian-Flow](https://github.com/Linyou/D3DGS)
+- Scripts that build the desynchronized split of the Plenoptic Video dataset
+- Scripts that train, render and evaluate every cell of Table 1
 
 ## 🔧 Installation
 
-One conda environment per backbone. Both bundle nvcc 11.7 and gcc 11, so no system CUDA toolkit is needed.
+- One conda environment per backbone; both bundle nvcc 11.7 and gcc 11, so no system CUDA toolkit is needed
+- A [COLMAP](https://colmap.github.io/) binary is needed once, to build the dataset (`conda create -n colmap -c conda-forge colmap`)
 
 ```bash
 git clone https://github.com/minutae1026/DebiasDesync.git && cd DebiasDesync
@@ -33,7 +38,7 @@ conda env create -f backbones/Gaussian-Flow/environment.yml
 conda activate debiasdesync-gaussian-flow && bash backbones/Gaussian-Flow/setup_env.sh
 ```
 
-A [COLMAP](https://colmap.github.io/) binary is needed once, to build the dataset (`conda create -n colmap -c conda-forge colmap`).
+Layout:
 
 ```
 {$ROOT}
@@ -50,7 +55,8 @@ A [COLMAP](https://colmap.github.io/) binary is needed once, to build the datase
 
 ## 📥 Dataset
 
-We use the six scenes of the [Plenoptic Video dataset](https://github.com/facebookresearch/Neural_3D_Video) ([v1.0 release](https://github.com/facebookresearch/Neural_3D_Video/releases/tag/v1.0)). The desynchronized split is not redistributed; the scripts below download the release and rebuild it deterministically.
+- We use the six scenes of the [Plenoptic Video dataset](https://github.com/facebookresearch/Neural_3D_Video) ([v1.0 release](https://github.com/facebookresearch/Neural_3D_Video/releases/tag/v1.0))
+- The desynchronized split is not redistributed; the scripts below download the release and rebuild it
 
 ```bash
 conda activate debiasdesync
@@ -59,12 +65,15 @@ python scripts/data/unpack_dynerf_src.py
 COLMAP_ENV=/path/to/conda/envs/colmap bash scripts/data/build_scenes.sh   # → data/dynerf/<scene>/ (~50 GB)
 ```
 
-Every training camera keeps a 200-frame window of the 300-frame timeline (random starts, so time offsets reach up to 100 frames), while `cam00` keeps all 300 frames as the test view. The script also runs COLMAP for the initial point cloud, computes the dynamic masks of the test view and checks every scene. The per-camera offsets are shipped in `backbones/4DGaussians/arguments/dynerf/<scene>.py` and verified against the built data.
+- Every training camera keeps a 200-frame window of the 300-frame timeline, with random starts so that time offsets reach up to 100 frames
+- `cam00` keeps all 300 frames and serves as the test view
+- `build_scenes.sh` also runs COLMAP for the initial point cloud, computes the dynamic masks of the test view and checks every scene
+- The per-camera offsets are shipped in `backbones/4DGaussians/arguments/dynerf/<scene>.py` and verified against the built data
 
 ## 🚀 Training
 
 ```bash
-# 4DGaussians rows: 6 scenes × {baseline, ours} × RUNS   (~80 min per run on an RTX 3090)
+# 4DGaussians rows
 conda activate debiasdesync
 RUNS=3 bash scripts/train_table1.sh
 
@@ -73,7 +82,9 @@ GFLOW_PY=/path/to/envs/debiasdesync-gaussian-flow/bin/python EVAL_PY=/path/to/en
 RUNS=3 bash scripts/train_table1_gflow.sh
 ```
 
-Each run trains, renders the 300 test frames and writes `results.json` / `per_view.json` into `output/<backbone>/<scene>_<condition>_<k>/`.
+- Each queue covers 6 scenes × {baseline, ours} × `RUNS` repetitions (about 80 min per run on an RTX 3090)
+- Each run trains, renders the 300 test frames and writes `results.json` / `per_view.json` into `output/<backbone>/<scene>_<condition>_<k>/`
+- Completed runs are skipped, so an interrupted queue can be restarted
 
 <details>
 <summary><b>Single runs by hand</b></summary>
@@ -112,7 +123,9 @@ The same options for Gaussian-Flow live in `backbones/Gaussian-Flow/arguments/dy
 
 ## 📊 Evaluation
 
-Metrics are computed by `backbones/4DGaussians/metrics.py` for both backbones and written to `results.json` of every run: PSNR on the full image, DyPSNR on the dynamic pixels of the test view, and DyPSNR-60 (`Dynamic-PSNR-edge60`) on the first and last 30 frames, the times with the fewest views. Each entry below is the mean ± std over three runs.
+- Metrics are computed by `backbones/4DGaussians/metrics.py` for both backbones and written to `results.json` of every run
+- **PSNR**: full image · **DyPSNR**: dynamic pixels of the test view · **DyPSNR-60** (`Dynamic-PSNR-edge60`): first and last 30 frames, the times with the fewest views
+- Each entry below is the mean ± std over three runs
 
 | Method | PSNR ↑ | DyPSNR ↑ | DyPSNR-60 ↑ |
 | --- | --- | --- | --- |

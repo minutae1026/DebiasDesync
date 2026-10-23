@@ -1,0 +1,1 @@
+upstream: https://github.com/graphdeco-inria/diff-gaussian-rasterization @ 59f5f77e3ddbac3ed9db93ec2cfe99ed6c5d121d (2023-08-27)

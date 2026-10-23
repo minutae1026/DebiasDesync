@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+*.so
+.ipynb_checkpoints/
+.vscode/
+
+# Dataset (Neural 3D Video; never committed)
+/data/
+
+# Training outputs
+/output/
+train_log_*.txt
+nohup.out
+
+# Gaussian-Flow build artifacts / copied glm headers
+backbones/Gaussian-Flow/submodules/diff-gaussian-rasterization/third_party/glm/*
+!backbones/Gaussian-Flow/submodules/diff-gaussian-rasterization/third_party/glm/README_GLM.txt
+
+# archives / papers dropped into the repository root
+*.tar.gz

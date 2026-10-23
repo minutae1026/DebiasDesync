@@ -1,0 +1,2 @@
+upstream: https://github.com/Linyou/D3DGS  branch d3dgs_poly  commit 4030d65fa214810b3470a723fae6cbb1bf452381 (2024-11-22)
+Only the files needed to train and render the dynerf scenes are kept; see the README for the changes.

@@ -1,0 +1,17 @@
+# pip packages (exact versions of the environment behind Table 1).
+# torch / torchvision are pinned in environment.yml (cu117 wheels).
+mmcv==1.6.0
+numpy==1.21.6
+scipy==1.7.3
+opencv-python-headless==4.6.0.66
+Pillow==9.5.0
+imageio==2.31.2
+imageio-ffmpeg==0.5.1
+matplotlib==3.5.3
+tqdm==4.68.2
+plyfile==0.9
+open3d==0.17.0
+lpips==0.1.4
+pytorch-msssim==1.0.0
+tensorboard==2.11.2
+protobuf==3.20.3

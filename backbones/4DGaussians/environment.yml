@@ -1,0 +1,26 @@
+# Conda environment used for every number in Table 1 (Python 3.7, torch 1.13.1 + CUDA 11.7).
+#   conda env create -f backbones/4DGaussians/environment.yml
+#   conda activate debiasdesync
+#   bash backbones/4DGaussians/setup_env.sh    # builds the two CUDA extensions in backbones/4DGaussians/submodules/
+#
+# The CUDA toolkit (nvcc 11.7) and gcc 11 come from conda so that no system CUDA/gcc is needed.
+# gcc 11 is required: CUDA 11.7 refuses newer host compilers.
+name: debiasdesync
+channels:
+  - nvidia/label/cuda-11.7.1
+  - conda-forge
+dependencies:
+  - python=3.7.12
+  - pip=23.3
+  - cuda-nvcc=11.7.99
+  - cuda-cudart-dev=11.7.99
+  - cuda-nvrtc-dev=11.7.99
+  - gcc_linux-64=11.4
+  - gxx_linux-64=11.4
+  - libxcrypt
+  - libgl-devel
+  - pip:
+      - --extra-index-url https://download.pytorch.org/whl/cu117
+      - torch==1.13.1+cu117
+      - torchvision==0.14.1+cu117
+      - -r requirements.txt   # resolved relative to this file

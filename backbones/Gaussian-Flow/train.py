@@ -158,8 +158,7 @@ def training(dataset, opt, pipe, flow_args, testing_iterations, saving_iteration
                 viewpoint_stack = scene.getTrainCameras()
             batch_size = opt.batch_size
             if opt.dataloader:
-                # Uniform sampling across time (Sec. 3.1): draw a global time step uniformly,
-                # then one of the views that observe it, instead of drawing images uniformly.
+                # Uniform sampling across time (Sec. 3.1)
                 _sampler = None
                 if getattr(opt, "uniform_t", False):
                     _inner = getattr(viewpoint_stack, "dataset", viewpoint_stack)
@@ -251,9 +250,7 @@ def training(dataset, opt, pipe, flow_args, testing_iterations, saving_iteration
         gt_images = torch.stack(gt_images)    
         
 
-        # Pixel-level weighing (Sec. 3.2): per-pixel L1 re-weighted by the reconstruction error
-        # within each image; the weighing exponent ramps linearly from 0 to 1 over the first
-        # pw_warmup_iters iterations.
+        # Pixel-level weighing (Sec. 3.2); the exponent ramps linearly from 0 to 1 over pw_warmup_iters
         if getattr(opt, "use_pixel_weighting", False):
             _ramp = min(1.0, iteration / float(max(1, getattr(opt, "pw_warmup_iters", 1000))))
             Ll1, _ = calc_pixel_weights(

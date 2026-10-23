@@ -99,7 +99,6 @@ def calc_pixel_weights(
     with torch.no_grad():
         score = per_pixel_l1.detach()
 
-        # lambda / (max - min) applied to the raw error equals lambda applied to the normalized error
         score_min = score.amin(dim=[1, 2], keepdim=True)
         score_max = score.amax(dim=[1, 2], keepdim=True)
         score_range = score_max - score_min

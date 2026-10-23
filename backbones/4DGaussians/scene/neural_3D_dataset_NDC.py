@@ -355,9 +355,7 @@ class Neural3D_NDC_Dataset(Dataset):
                 path = images_path[idx]
                 image_paths.append(os.path.join(image_path,path))
                 
-                # Train cameras hold a window of countss frames out of the eval_frame_count-frame
-                # timeline; their local time is scaled so that one frame has the same duration
-                # on both axes. The camera's offset (gt_delta_time) is added at render time.
+                # train cameras: local time scaled to the global timeline (the camera's offset is added at render time)
                 if split == "train":
                     image_times.append((2*(idx / (countss-1)) -1) * ((countss-1) / (eval_frame_count-1)))
                 else:

@@ -33,9 +33,7 @@ from utils.loss_utils import l1_loss, ssim, l2_loss
 
 from . import taichi_modules
 
-# torch.compile exists only in torch >= 2.0; with torch 1.13 the two decorated functions
-# (_rig_loss, regularization_losses) run eagerly. They are pure speed optimizations and are
-# not even called with the dynerf configs (knn_loss / scale_loss are off).
+# torch.compile is not available in torch 1.13; the decorated functions then run eagerly.
 if not hasattr(torch, "compile"):
     def _compile_noop(*args, **kwargs):
         if args and callable(args[0]):

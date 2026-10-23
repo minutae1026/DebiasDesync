@@ -35,9 +35,7 @@ class FourDGSdataset(Dataset):
                 FovX = caminfo.FovX
                 FovY = caminfo.FovY
                 time = caminfo.time
-                # Some datasets (e.g., dynerf validation / video trajectories) use CameraInfo
-                # which does not define cam_id or cam_index. In those cases, fall back to
-                # sensible defaults so that rendering still works without errors.
+                # CameraInfo (video trajectories) has no cam_id / cam_index
                 cam_id = getattr(caminfo, "cam_id", None)
                 cam_index = getattr(caminfo, "cam_index", 0)
                 frame_index = getattr(caminfo, "frame_index", 0)

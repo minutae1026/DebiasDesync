@@ -1,4 +1,4 @@
-# Conda environment used for every number in Table 1 (Python 3.7, torch 1.13.1 + CUDA 11.7).
+# Conda environment for the 4DGaussians backbone (Python 3.7, torch 1.13.1 + CUDA 11.7).
 #   conda env create -f backbones/4DGaussians/environment.yml
 #   conda activate debiasdesync
 #   bash backbones/4DGaussians/setup_env.sh    # builds the two CUDA extensions in backbones/4DGaussians/submodules/

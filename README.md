@@ -92,33 +92,33 @@ RUNS=3 bash scripts/train_table1_gflow.sh
 
 <br>
 
-4DGaussians (from `backbones/4DGaussians/`, env `debiasdesync`):
+- **4DGaussians** — run from `backbones/4DGaussians/` in the `debiasdesync` env; drop the three flags for the baseline
 
-```bash
-S=sear_steak; M=../../output/4DGaussians/${S}_dynamic_1
-python train.py -s ../../data/dynerf/$S --model_path $M --configs arguments/dynerf/$S.py --resolution 2 \
-       --uniform_time_sampling --pixel_weighting --pixel_weighting_ratio 30     # drop the three flags for the baseline
-python render.py  --model_path $M --skip_train --configs arguments/dynerf/$S.py
-python metrics.py --model_path $M --dynamic_mask_root ../../data/dynerf --cleanup
-```
+  ```bash
+  S=sear_steak; M=../../output/4DGaussians/${S}_dynamic_1
+  python train.py -s ../../data/dynerf/$S --model_path $M --configs arguments/dynerf/$S.py --resolution 2 \
+         --uniform_time_sampling --pixel_weighting --pixel_weighting_ratio 30
+  python render.py  --model_path $M --skip_train --configs arguments/dynerf/$S.py
+  python metrics.py --model_path $M --dynamic_mask_root ../../data/dynerf --cleanup
+  ```
 
-Gaussian-Flow (from `backbones/Gaussian-Flow/`, env `debiasdesync-gaussian-flow`; `gf_base.py` = as released, `gf_ours.py` = + ours):
+- **Gaussian-Flow** — run from `backbones/Gaussian-Flow/` in the `debiasdesync-gaussian-flow` env; `gf_base.py` = as released, `gf_ours.py` = + ours
 
-```bash
-S=sear_steak; M=../../output/Gaussian-Flow/${S}_ours_1
-python train.py -s ../../data/dynerf/$S --model_path $M --config arguments/dynerf/gf_ours.py --test_iterations 29999 --eval
-python render_dynamic.py -s ../../data/dynerf/$S --model_path $M --configs arguments/dynerf/gf_ours.py --eval --skip_train --skip_video --ckpt_name chkpnt30000.pth
-conda activate debiasdesync && python ../4DGaussians/metrics.py --model_path $M --dynamic_mask_root ../../data/dynerf --cleanup
-```
+  ```bash
+  S=sear_steak; M=../../output/Gaussian-Flow/${S}_ours_1
+  python train.py -s ../../data/dynerf/$S --model_path $M --config arguments/dynerf/gf_ours.py --test_iterations 29999 --eval
+  python render_dynamic.py -s ../../data/dynerf/$S --model_path $M --configs arguments/dynerf/gf_ours.py --eval --skip_train --skip_video --ckpt_name chkpnt30000.pth
+  conda activate debiasdesync && python ../4DGaussians/metrics.py --model_path $M --dynamic_mask_root ../../data/dynerf --cleanup
+  ```
 
-| 4DGaussians option | Default | Description |
-| --- | --- | --- |
-| `--uniform_time_sampling` | off | Frame-level uniform sampling across time (Sec. 3.1) |
-| `--pixel_weighting` | off | Pixel-level weighing of the L1 loss by reconstruction error (Sec. 3.2) |
-| `--pixel_weighting_ratio` | `30` | r in λ = log r, the strength of the weighing |
-| `--pixel_weighting_warmup` | `1000` | Fine-stage iterations over which the weighing exponent ramps from 0 to 1 |
+- **Options** of our training strategy (4DGaussians flags; the same options for Gaussian-Flow live in `backbones/Gaussian-Flow/arguments/dynerf/gf_ours.py`)
 
-The same options for Gaussian-Flow live in `backbones/Gaussian-Flow/arguments/dynerf/gf_ours.py`.
+  | 4DGaussians option | Default | Description |
+  | --- | --- | --- |
+  | `--uniform_time_sampling` | off | Frame-level uniform sampling across time (Sec. 3.1) |
+  | `--pixel_weighting` | off | Pixel-level weighing of the L1 loss by reconstruction error (Sec. 3.2) |
+  | `--pixel_weighting_ratio` | `30` | r in λ = log r, the strength of the weighing |
+  | `--pixel_weighting_warmup` | `1000` | Fine-stage iterations over which the weighing exponent ramps from 0 to 1 |
 
 </details>
 

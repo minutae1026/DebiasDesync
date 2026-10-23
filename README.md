@@ -13,7 +13,9 @@
 
 </div>
 
-Multi-view videos captured in the wild are desynchronized, so some points in time are observed by many cameras and others by only a few. Standard training of 4D representations inherits this **temporal view coverage bias** and under-fits the sparsely covered times, exactly where dynamic content suffers. We debias the training with two simple changes: **uniform sampling across time** (a time step is drawn uniformly, then one of its available views) and **pixel-level weighing** of the photometric loss by the reconstruction error. This repository reproduces Table 1 of the paper on two backbones, [4DGaussians](https://github.com/hustvl/4DGaussians) and [Gaussian-Flow](https://github.com/Linyou/D3DGS), on the six scenes of the Plenoptic Video dataset in a desynchronized setting.
+We propose a simple method to balance the view coverage bias when reconstructing dynamic scenes from multiple desynchronized videos. When multiple videos of the same scene are captured from various views in the wild, they are often desynchronized: some start later, and some end earlier than the rest. In these cases, the amount of coverage a point in space and time has differs from one point to the other, leading to 4D representations focusing on one point over the other, especially prominent in dynamic parts of the scene where observations are limited. We thus propose to debias the training of 4D representations: (1) by sampling uniformly across modeled time, not across captured frames; and (2) by assigning higher weight to pixels with higher reconstruction error during training. We evaluate our method on the Plenoptic Video dataset by introducing random camera-specific time offsets of up to 100 frames, and show that, while simple, it enhances the reconstruction quality, especially in dynamic regions.
+
+This repository contains the training strategy applied to two backbones, [4DGaussians](https://github.com/hustvl/4DGaussians) and [Gaussian-Flow](https://github.com/Linyou/D3DGS), together with the scripts that build the desynchronized split and reproduce Table 1 of the paper.
 
 ## 🔧 Installation
 

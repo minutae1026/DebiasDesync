@@ -15,11 +15,9 @@ A source video longer than F frames (flame_salmon_1 has 1200) is cut to its firs
 the standard 10 s x 30 fps protocol of the dataset.
 
 Training frames. By default the PNGs are decoded from the source video and the trimmed mp4
-is re-encoded afterwards from them (scripts/data/make_trimmed_videos.py). The paper's
-coffee_martini, cook_spinach and sear_steak were prepared the other way round
-(--legacy_trim): the source mp4 is first cut to the window at full resolution with ffmpeg
-and the PNGs are decoded from that re-encoded video, so their training frames carry one
-extra x264 generation (about 1.4/255 mean absolute difference). cam00 is identical either way.
+is re-encoded afterwards from them (scripts/data/make_trimmed_videos.py). With --legacy_trim
+(used for coffee_martini, cook_spinach and sear_steak) the source mp4 is cut to the window
+first and the PNGs are decoded from the cut video.
 
     python scripts/data/build_unsync_scene.py --scene flame_steak
     python scripts/data/build_unsync_scene.py --scene cook_spinach --verify
@@ -192,10 +190,9 @@ def _bitrate_kbps(exe: str, path: Path) -> int:
 
 
 def trim_video(scene_dir: Path, cam: str, start: int, window: int, full: int) -> bool:
-    """Cut <cam>.mp4 to frames [start, start+window-1] at full resolution (legacy procedure).
-
-    libx264, preset medium, yuv420p, 30 fps, bitrate = source x (window/full) -- the settings
-    used for the paper's first three scenes. False if the video already has window frames.
+    """Cut <cam>.mp4 to frames [start, start+window-1] at full resolution
+    (libx264, preset medium, yuv420p, 30 fps, bitrate = source x window/full).
+    False if the video already has window frames.
     """
     src = scene_dir / f"{cam}.mp4"
     if _video_frames(src) == window:
@@ -294,8 +291,7 @@ def build(scene: str, root: Path, full: int, window: int, legacy: bool = False) 
     describe(lay)
 
     if legacy:
-        # paper procedure for coffee_martini / cook_spinach / sear_steak: cut the source video
-        # first, then decode the training frames from the cut (re-encoded) video
+        # cut the source video first, then decode the training frames from the cut video
         for cam in sorted(lay.starts):
             did = trim_video(scene_dir, cam, lay.starts[cam], window, full)
             print(f"  [trim mp4] {cam} -> {window} frames{'' if did else ' (already trimmed)'}", flush=True)
@@ -319,9 +315,8 @@ def build(scene: str, root: Path, full: int, window: int, legacy: bool = False) 
 
     (scene_dir / f"{scene}_frames.txt").write_text(render_frames_txt(lay))
     print(f"  [write] {scene_dir / f'{scene}_frames.txt'}")
-    # The shipped configs are the ones behind the paper's numbers and are never overwritten;
-    # an existing config must agree with the plan, otherwise the trainer would use offsets
-    # that do not match the frames on disk.
+    # Shipped configs are never overwritten; an existing config must agree with the plan,
+    # otherwise the trainer would use offsets that do not match the frames on disk.
     cfg = CFG_DIR / f"{scene}.py"
     if cfg.is_file():
         if not verify(scene, root):
@@ -341,7 +336,7 @@ def main() -> int:
     ap.add_argument("--window", type=int, default=WINDOW)
     ap.add_argument("--legacy_trim", action="store_true",
                     help="cut the source mp4 first and decode the training frames from it "
-                         "(how the paper's coffee_martini, cook_spinach and sear_steak were made)")
+                         "(coffee_martini, cook_spinach, sear_steak)")
     ap.add_argument("--dry_run", action="store_true", help="print the assignment only")
     ap.add_argument("--verify", action="store_true", help="compare existing outputs with the plan")
     a = ap.parse_args()

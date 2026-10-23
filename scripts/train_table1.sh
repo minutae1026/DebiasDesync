@@ -12,8 +12,6 @@
 # Each run: train (coarse 3000 + fine 14000 it, batch 4, half resolution) -> render test view
 # (cam00, 300 frames) -> metrics (PSNR / DyPSNR / DyPSNR-60 into results.json + per_view.json).
 # Completed runs (results.json present) are skipped, so the queue can be restarted.
-# The seed is fixed (6666) but grid_sample's CUDA backward is non-deterministic, so repetitions differ;
-# the paper reports mean±std over the repetitions.
 set -u
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 GS="$REPO/backbones/4DGaussians"

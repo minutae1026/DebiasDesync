@@ -44,10 +44,9 @@ import taichi as ti
 ti.init(arch=ti.cuda, offline_cache=False)
 
 
-# Taichi (DDDM) allocates from its own CUDA pool, outside PyTorch's caching allocator.
-# On a 24 GB GPU the larger scenes (>100k Gaussians) ran out of memory late in training
-# when PyTorch had cached almost all VRAM, so PyTorch is capped at a fraction of the
-# device memory and its cache is released periodically (see the training loop).
+# Taichi (DDDM) allocates from its own CUDA pool, outside PyTorch's caching allocator, so
+# PyTorch is capped at a fraction of the device memory and its cache is released periodically
+# (see the training loop).
 _VRAM_FRACTION = float(os.environ.get("OURS_TORCH_VRAM_FRACTION", "0.90"))
 
 def reserve_vram_for_taichi():

@@ -10,8 +10,7 @@
 #   b. window  assign each train camera a 200-frame window [s, s+199] with seed 777 and extract the
 #              frames at 1352x1014 (scripts/data/build_unsync_scene.py); cam00 keeps all 300 frames.
 #              For the scenes in LEGACY_SCENES the source mp4 is cut first (ffmpeg, full resolution)
-#              and the frames are decoded from the cut video, as was done for the paper's
-#              coffee_martini / cook_spinach / sear_steak; the other three scenes decode the frames
+#              and the frames are decoded from the cut video; the other scenes decode the frames
 #              from the source video directly.
 #   c. mp4     re-encode every train camera's mp4 to its 200 frames (the loader reads the time
 #              axis from the mp4 frame count, so this step is mandatory; already done for legacy scenes)

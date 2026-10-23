@@ -9,7 +9,7 @@
 # Everything is taken from the active environment ($CONDA_PREFIX): nvcc 11.7, gcc 11 and the
 # CUDA headers come from conda, so no system CUDA toolkit is required.
 #
-# Known quirks (all hit on the original machine, all handled below):
+# Build notes:
 #   - conda's compiler_compat/ld cannot find system libraries -> disabled
 #   - python's sysconfig LDSHARED carries '-Wl,--sysroot=/' which breaks merged-usr layouts -> overridden
 #   - open3d needs libGL -> conda libgl-devel + LD_LIBRARY_PATH (exported via an activate hook)

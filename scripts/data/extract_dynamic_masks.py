@@ -5,8 +5,7 @@ Per-frame dynamic masks via temporal-median background subtraction.
 For each (scene, cam), the per-pixel temporal median across all frames
 approximates the static background; large |I_t - median| marks dynamic regions.
 
-Confirmed adopted setup (research_progress.md, 2026-04-25):
-  --threshold 15 --color gray  (no morph)
+Setting used for the evaluation masks: --threshold 15 --color gray (no morphology).
 
 Outputs to <out_root>/<scene>/<cam>/dynamic_mask/dynamic_mask_<frame_idx>.png
 """

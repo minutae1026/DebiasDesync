@@ -88,7 +88,7 @@ RUNS=3 bash scripts/train_table1_gflow.sh
 - Completed runs are skipped, so an interrupted queue can be restarted
 
 <details>
-<summary><b>Single runs by hand</b></summary>
+<summary><b>Single runs</b></summary>
 
 <br>
 

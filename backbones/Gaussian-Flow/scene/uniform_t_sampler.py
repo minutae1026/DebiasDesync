@@ -7,12 +7,8 @@ __all__ = ["UniformTSampler"]
 class UniformTSampler(Sampler):
     """Frame-level uniform sampling across time (Sec. 3.1) for the Gaussian-Flow backbone.
 
-    The loader gives every training image its global frame index s_k + j (see
-    scene/neural_3D_dataset_NDC.py). A time step is drawn uniformly among the steps that
-    have at least one view, then one of its views uniformly, so every time step receives
-    the same expected number of updates regardless of how many cameras observe it.
-    Draws are with replacement and never end. Times are passed as an array so that no
-    image is decoded at construction.
+    A time step is drawn uniformly among the steps that have at least one view, then one
+    of its views uniformly. Draws are with replacement and never end.
     """
 
     def __init__(self, times, frame_count=300, seed=6666):

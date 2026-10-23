@@ -1,15 +1,8 @@
 #!/usr/bin/env python3
 """Re-encode every training camera's mp4 from its trimmed frames.
 
-The 4DGaussians loader (scene/neural_3D_dataset_NDC.py) reads the number of frames of
-each mp4 and builds the time axis from it:
-
-    image_times = (2*idx/(countss-1) - 1) * ((countss-1)/(eval_frame_count-1))
-
-With the original 300-frame (1200 for flame_salmon_1) videos the time axis of a
-200-frame window would be wrong and the loader would even extract the missing frames,
-undoing the desynchronized split. The mp4 therefore defines the time axis and must hold
-exactly the window's frames. cam00 keeps its 300 frames.
+The loaders derive the time axis from the frame count of each mp4, so a training camera's
+mp4 must hold exactly the frames of its window. cam00 keeps its 300 frames.
 
 Encoding: libx264, preset medium, yuv420p, 30 fps, bitrate = source x (window/full).
 

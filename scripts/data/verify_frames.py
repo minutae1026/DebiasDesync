@@ -33,9 +33,7 @@ PNG_SIG = b"\x89PNG\r\n\x1a\n"
 def bad_reason(path: Path, deep: bool = False):
     """Reason the file is broken, or None.
 
-    Only the 33-byte header and the 12-byte tail are read by default: truncation (the
-    failure mode of an interrupted write) shows up as a missing IEND chunk. --deep also
-    decodes the pixels.
+    Only the PNG header and the IEND tail are read by default; --deep also decodes the pixels.
     """
     try:
         with open(path, "rb") as fh:

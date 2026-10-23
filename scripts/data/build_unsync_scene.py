@@ -9,7 +9,7 @@
                  covering the same times are not spatially adjacent
     offset       global time offset of a camera on the [-1, 1] axis:
                  (2s + T - F) / (F - 1)  ==  (s - (F-T)/2) * 2 / (F-1)
-    seed         777 (random.Random); the shipped backbones/4DGaussians/arguments/dynerf/<scene>.py were made with it
+    seed         777 (random.Random)
 
 A source video longer than F frames (flame_salmon_1 has 1200) is cut to its first F frames,
 the standard 10 s x 30 fps protocol of the dataset.
@@ -51,9 +51,8 @@ FULL_FRAMES = 300      # length F of the common timeline
 WINDOW = 200           # window length T of every training camera
 SEED = 777
 
-# Cameras that are desynchronized in the original capture; the window start is shifted
-# by this many frames when computing the offset. coffee_martini/cam13: about 45 frames
-# (Sync-NeRF, Fig. 3-4).
+# Cameras that are desynchronized in the original capture: the global time of their window
+# is shifted by this many frames.
 KNOWN_MISALIGNED = {("coffee_martini", "cam13"): 45}
 
 FRAME_RE = re.compile(r"\d+\.png$")

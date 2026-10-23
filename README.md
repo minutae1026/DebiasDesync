@@ -6,7 +6,7 @@
 
 **Minwoo Tae**¹ · Jeong-gi Kwak² · Sunoh Kim¹ · Sang-Il Choi¹\* · Kwang Moo Yi²\*
 
-¹ Dankook University, Republic of Korea &nbsp;&nbsp;·&nbsp;&nbsp; ² University of British Columbia, Canada
+¹ Dankook University, South Korea &nbsp;&nbsp;·&nbsp;&nbsp; ² University of British Columbia, Canada
 <br><sub>\* Corresponding authors</sub>
 
 <img src="assets/teaser.png" width="900">

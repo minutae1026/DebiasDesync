@@ -306,13 +306,9 @@ class Neural3D_NDC_Dataset(Dataset):
         image_paths = []
         image_poses = []
         image_times = []
-        # Desynchronized capture: every training camera holds a window of the global timeline;
-        # the test camera holds the whole timeline. <scene>_frames.txt (written next to the data
-        # by scripts/data/build_unsync_scene.py) gives, per camera, the kept source frames [s, s+T-1]
-        # and "global_start", the global frame of the first kept frame. The two differ only for
-        # cameras that are desynchronized in the original capture (coffee_martini/cam13, +45),
-        # for which global_start carries the correction, exactly like the offsets of the
-        # 4DGaussians configs. Files without the field fall back to s.
+        # Desynchronized capture: <scene>_frames.txt (written by scripts/data/build_unsync_scene.py)
+        # gives every training camera its window start s and its global_start (s plus the
+        # correction of cameras that are desynchronized in the original capture).
         self._cam_start = {}
         import re as _re
         _ftxt = os.path.join(self.root_dir, os.path.basename(self.root_dir.rstrip('/')) + "_frames.txt")
@@ -371,9 +367,7 @@ class Neural3D_NDC_Dataset(Dataset):
                 R = -R
                 R[:,0] = -R[:,0]
                 T = -pose[:3,3].dot(R)
-                # Local frame j of camera k is global frame s_k + j. The raw global index is
-                # stored (as upstream does for its raw index); the model normalizes it in
-                # GaussianModel.set_timestamp (t / max_frames, then * 0.8 + 0.1).
+                # local frame j -> global frame global_start + j (normalized later in GaussianModel.set_timestamp)
                 _s = self._cam_start.get(_cam_name, 0)
                 image_times.append(float(_s + idx))
                 image_poses.append((R,T))

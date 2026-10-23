@@ -24,7 +24,8 @@ This repository provides:
 ## 🔧 Installation
 
 - One conda environment per backbone; both bundle nvcc 11.7 and gcc 11, so no system CUDA toolkit is needed
-- A [COLMAP](https://colmap.github.io/) binary is needed once, to build the dataset (`conda create -n colmap -c conda-forge colmap`)
+- A [COLMAP](https://colmap.github.io/) binary with CUDA is needed once, to build the dataset (`conda create -n colmap -c conda-forge colmap`)
+- Tested on Ubuntu with an RTX 3090 (24 GB); Gaussian-Flow needs about that much GPU memory
 
 ```bash
 git clone https://github.com/minutae1026/DebiasDesync.git && cd DebiasDesync
@@ -124,7 +125,7 @@ The same options for Gaussian-Flow live in `backbones/Gaussian-Flow/arguments/dy
 ## 📊 Evaluation
 
 - Metrics are computed by `backbones/4DGaussians/metrics.py` for both backbones and written to `results.json` of every run
-- **PSNR**: full image · **DyPSNR**: dynamic pixels of the test view · **DyPSNR-60** (`Dynamic-PSNR-edge60`): first and last 30 frames, the times with the fewest views
+- **PSNR** (`PSNR`): full image · **DyPSNR** (`Dynamic-PSNR`): dynamic pixels of the test view · **DyPSNR-60** (`Dynamic-PSNR-edge60`): first and last 30 frames, the times with the fewest views
 - Each entry below is the mean ± std over three runs
 
 | Method | PSNR ↑ | DyPSNR ↑ | DyPSNR-60 ↑ |

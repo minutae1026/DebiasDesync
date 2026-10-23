@@ -88,13 +88,11 @@ class OptimizationParams(ParamGroup):
         self.opacity_lr = 0.05
         self.scaling_lr = 0.005
         self.rotation_lr = 0.005
-        # Our training strategy for the desynchronized setting. All off = the released
-        # Gaussian-Flow training. Set by arguments/dynerf/gf_ours.py.
-        self.uniform_t = False              # uniform sampling across time (Sec. 3.1)
-        self.frame_count = 300              # length of the global timeline
-        self.use_pixel_weighting = False    # pixel-level weighing of the L1 loss (Sec. 3.2)
-        self.pixel_weighting_ratio = 30.0   # r in lambda = log r
-        self.pw_warmup_iters = 1000         # linear warm-up of the weighing exponent
+        self.uniform_t = False
+        self.frame_count = 300
+        self.use_pixel_weighting = False
+        self.pixel_weighting_ratio = 30.0
+        self.pw_warmup_iters = 1000
         self.percent_dense = 0.01
         self.lambda_dssim = 0.2
         self.densification_interval = 100

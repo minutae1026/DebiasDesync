@@ -33,7 +33,6 @@ from utils.loss_utils import l1_loss, ssim, l2_loss
 
 from . import taichi_modules
 
-# torch.compile is not available in torch 1.13; the decorated functions then run eagerly.
 if not hasattr(torch, "compile"):
     def _compile_noop(*args, **kwargs):
         if args and callable(args[0]):

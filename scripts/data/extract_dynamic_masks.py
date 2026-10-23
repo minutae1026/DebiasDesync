@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
 """
-Per-frame dynamic masks via temporal-median background subtraction.
-
-For each (scene, cam), the per-pixel temporal median across all frames
-approximates the static background; large |I_t - median| marks dynamic regions.
-
-Setting used for the evaluation masks: --threshold 15 --color gray (no morphology).
-
-Outputs to <out_root>/<scene>/<cam>/dynamic_mask/dynamic_mask_<frame_idx>.png
+    python scripts/data/extract_dynamic_masks.py --scenes <scene> --cams cam00 --threshold 15 --color gray
 """
 from __future__ import annotations
 
@@ -37,7 +30,6 @@ def morph_clean(mask: np.ndarray, ksize: int = 3) -> np.ndarray:
 
 
 def discover_cams(scene_dir: Path) -> list[str]:
-    """Return sorted list of cam names with images/ subfolder under scene_dir."""
     cams: list[str] = []
     for p in sorted(scene_dir.iterdir()):
         if p.is_dir() and re.match(r"^cam\d+$", p.name) and (p / "images").is_dir():

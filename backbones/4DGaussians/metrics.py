@@ -26,8 +26,6 @@ import gc
 import re
 import math
 
-# DyPSNR-60: dynamic PSNR restricted to the first 30 and last 30 frames of the sequence,
-# i.e. the frames observed by the fewest training cameras in the desynchronized setting.
 EDGE_FRAMES = 60
 
 
@@ -45,8 +43,6 @@ def readImages(renders_dir, gt_dir):
 
 
 def _infer_scene_name(model_dir: Path, mask_root: Path):
-    """Scene name = longest <mask_root> sub-directory that prefixes the run name
-    (e.g. cook_spinach_dynamic_1 -> cook_spinach)."""
     model_name = model_dir.name
     if not mask_root.is_dir():
         return None
@@ -68,7 +64,6 @@ def _load_dynamic_mask_tensor(mask_path: Path, h: int, w: int, device):
 
 
 def _masked_psnr(render_t, gt_t, mask_bool):
-    """PSNR over the pixels selected by mask_bool ([1,1,H,W]); NaN if the mask is empty."""
     if mask_bool is None:
         return float("nan")
     m = mask_bool.expand(-1, 3, -1, -1)
@@ -88,7 +83,6 @@ def _safe_nanmean(values):
 
 
 def _edge_mean(per_frame_dict, total_edge):
-    """Mean over the first total_edge/2 and last total_edge/2 frames (index from the file name)."""
     half = total_edge // 2
     pairs = []
     for name, val in per_frame_dict.items():
@@ -109,8 +103,6 @@ def evaluate(model_paths, dynamic_mask_root=None, cleanup=False):
     full_dict = {}
     per_view_dict = {}
     print("")
-    # Dynamic masks: <mask_root>/<scene>/cam00/dynamic_mask/dynamic_mask_<frame>.png.
-    # A relative mask_root is resolved against the repository root (two levels up).
     if dynamic_mask_root:
         dm_path = Path(dynamic_mask_root)
         mask_root = dm_path if dm_path.is_absolute() else (Path(__file__).resolve().parents[2] / dm_path).resolve()
@@ -155,7 +147,6 @@ def evaluate(model_paths, dynamic_mask_root=None, cleanup=False):
                     ms_ssims.append(ms_ssim(renders[idx], gts[idx],data_range=1, size_average=True ))
                     lpipsa.append(lpips(renders[idx], gts[idx], net_type='alex'))
                     Dssims.append((1-ms_ssims[-1])/2)
-                    # Dynamic / static PSNR from the test camera's dynamic mask
                     if scene_name is not None:
                         frame_idx = int(Path(image_names[idx]).stem)
                         mpath = mask_root / scene_name / "cam00" / "dynamic_mask" / f"dynamic_mask_{frame_idx}.png"
@@ -226,8 +217,6 @@ def evaluate(model_paths, dynamic_mask_root=None, cleanup=False):
             with open(scene_dir + "/per_view.json", 'w') as fp:
                 json.dump(per_view_dict[scene_dir], fp, indent=True)
 
-            # --cleanup: delete the rendered PNGs once the metrics are stored (about 700 MB per run).
-            # The checkpoint is kept, so render.py can regenerate them at any time.
             if cleanup:
                 freed = 0
                 for method_dir in (test_dir.iterdir() if test_dir.exists() else []):

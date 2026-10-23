@@ -35,7 +35,6 @@ class FourDGSdataset(Dataset):
                 FovX = caminfo.FovX
                 FovY = caminfo.FovY
                 time = caminfo.time
-                # CameraInfo (video trajectories) has no cam_id / cam_index
                 cam_id = getattr(caminfo, "cam_id", None)
                 cam_index = getattr(caminfo, "cam_index", 0)
                 frame_index = getattr(caminfo, "frame_index", 0)

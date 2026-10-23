@@ -1,15 +1,9 @@
 #!/bin/bash
-# Build the CUDA extensions of the Gaussian-Flow backbone inside the environment created from
-# Gaussian-Flow/environment.yml, and check that train.py's imports resolve.
 #
 #   conda env create -f backbones/Gaussian-Flow/environment.yml
 #   conda activate debiasdesync-gaussian-flow
 #   bash backbones/Gaussian-Flow/setup_env.sh
 #
-# Extensions:
-#   submodules/diff-gaussian-rasterization  stock Inria rasterizer (commit 59f5f77); its glm headers
-#                                           are shared with the 4DGaussians rasterizer in ../4DGaussians/submodules/
-#   ../4DGaussians/submodules/simple-knn    same source as the 4DGaussians environment
 set -euo pipefail
 
 GF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -35,7 +29,6 @@ export CXX="$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++"
 export CUDAHOSTCXX="$CXX"
 export LDSHARED="$CXX -pthread -shared"
 
-# glm headers of the stock rasterizer (same commit as the 4DGaussians variant's submodule)
 GLM_SRC="$REPO/4DGaussians/submodules/depth-diff-gaussian-rasterization/third_party/glm"
 GLM_DST="$GF/submodules/diff-gaussian-rasterization/third_party/glm"
 if [ ! -f "$GLM_DST/glm/glm.hpp" ]; then

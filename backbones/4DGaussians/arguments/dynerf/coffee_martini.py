@@ -1,8 +1,5 @@
 _base_ = './default.py'
 
-# Desynchronized setting: cam00 is the test view with all 300 frames; every training
-# camera observes a 200-frame window [s, s+199] of the common timeline. Its time offset
-# on the global [-1, 1] axis is (s - 50) * 2 / 299 (seed 777, scripts/data/build_unsync_scene.py).
 ModelParams = dict(
     eval_index=0,
     gt_delta_time=[

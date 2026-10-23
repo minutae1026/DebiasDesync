@@ -2,7 +2,6 @@
 #   conda env create -f backbones/Gaussian-Flow/environment.yml
 #   conda activate debiasdesync-gaussian-flow
 #   bash backbones/Gaussian-Flow/setup_env.sh   # builds the stock rasterizer and simple-knn
-# Gaussian-Flow needs its own environment (Taichi, stock Inria rasterizer).
 name: debiasdesync-gaussian-flow
 channels:
   - nvidia/label/cuda-11.7.1

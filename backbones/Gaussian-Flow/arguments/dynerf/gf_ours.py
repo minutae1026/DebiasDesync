@@ -1,5 +1,3 @@
-# Gaussian-Flow + Ours: uniform sampling across time (Sec. 3.1) and pixel-level weighing
-# (Sec. 3.2, r = 30, 1000-iteration linear warm-up) on top of gf_base.py.
 _base_ = './gf_base.py'
 
 OptimizationParams = dict(

@@ -3,8 +3,6 @@
 #   conda activate debiasdesync
 #   bash backbones/4DGaussians/setup_env.sh    # builds the two CUDA extensions in backbones/4DGaussians/submodules/
 #
-# The CUDA toolkit (nvcc 11.7) and gcc 11 come from conda so that no system CUDA/gcc is needed.
-# gcc 11 is required: CUDA 11.7 refuses newer host compilers.
 name: debiasdesync
 channels:
   - nvidia/label/cuda-11.7.1

@@ -3,7 +3,6 @@ import sys
 
 
 def process_ply_file(input_file, output_file):
-    # Voxel-downsample the COLMAP dense point cloud to at most 40k points (4DGaussians recipe).
     pcd = o3d.io.read_point_cloud(input_file)
     print(f"Total points: {len(pcd.points)}")
 

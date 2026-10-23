@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
-"""Extract the Neural 3D Video archives in data/_dynerf_src/ with Python's zipfile.
-
-flame_salmon_1 ships as a 4-part split archive (z01/z02/z03/zip). The parts are joined
-and the central directory is read directly: zipfile refuses split archives, and the local
-header offsets are relative to the part (disk) the entry starts on.
+"""
+    python scripts/data/unpack_dynerf_src.py
 """
 import os
 import struct
@@ -35,7 +32,6 @@ def join_split():
 
 
 def extract_split(path, dest, part_size):
-    """Extract a joined split archive by walking its central directory."""
     size = os.path.getsize(path)
     with open(path, "rb") as f:
         f.seek(size - min(size, 1 << 20))

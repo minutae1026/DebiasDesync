@@ -49,7 +49,6 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
             prefiltered=False,
             debug=pipe.debug
         )
-        # Desynchronized capture: map the camera's local time to the global timeline.
         cam_idx = viewpoint_camera.cam_index
         time = torch.tensor(viewpoint_camera.time).to(means3D.device) + torch.tensor(gt_delta_time[cam_idx]).to(means3D.device)
         time = time.repeat(means3D.shape[0], 1)
@@ -118,7 +117,6 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
     else:
         colors_precomp = override_color
 
-    # Rasterizer requires exactly one of shs or colors_precomp
     shs_for_raster = None if colors_precomp is not None else shs_final
     colors_for_raster = colors_precomp
 

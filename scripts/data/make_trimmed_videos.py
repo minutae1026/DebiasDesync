@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-"""Re-encode every training camera's mp4 from its trimmed frames.
-
-The loaders derive the time axis from the frame count of each mp4, so a training camera's
-mp4 must hold exactly the frames of its window. cam00 keeps its 300 frames.
-
-Encoding: libx264, preset medium, yuv420p, 30 fps, bitrate = source x (window/full).
-
+"""
     python scripts/data/make_trimmed_videos.py --scenes flame_steak
     python scripts/data/make_trimmed_videos.py --check_only
 """
@@ -45,7 +39,6 @@ def frame_count(path: Path) -> int:
 
 
 def bitrate_kbps(exe: str, path: Path) -> int:
-    """Source bitrate in kbps, read with ffmpeg (the static build has no ffprobe)."""
     r = subprocess.run([exe, "-i", str(path)], capture_output=True, text=True)
     for line in r.stderr.splitlines():
         if "bitrate:" in line:
@@ -74,7 +67,7 @@ def encode(exe: str, img_dir: Path, out: Path, n: int, kbps: int) -> bool:
         if got != n:
             print(f"    frame count mismatch: {got} (expected {n})")
             return False
-        shutil.move(str(tmp_out), str(out))   # atomic replace
+        shutil.move(str(tmp_out), str(out))
     return True
 
 

@@ -172,7 +172,6 @@ def render_sets(dataset : ModelParams, opt, flow_args, iteration : int, pipeline
             
 if __name__ == "__main__":
     ti.init(arch=ti.cuda, offline_cache=False)
-    # Leave VRAM for Taichi's own CUDA pool (see train.py).
     if torch.cuda.is_available():
         torch.cuda.set_per_process_memory_fraction(
             float(os.environ.get("OURS_TORCH_VRAM_FRACTION", "0.90")), 0)

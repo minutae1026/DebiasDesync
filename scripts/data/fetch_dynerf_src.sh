@@ -1,8 +1,5 @@
 #!/bin/bash
-# Download the original Neural 3D Video release (v1.0, CC BY-NC 4.0) into data/_dynerf_src/.
 #   bash scripts/data/fetch_dynerf_src.sh
-# Archives already present are kept (wget -c resumes partial downloads).
-# flame_salmon_1 is a 4-part split archive; scripts/data/unpack_dynerf_src.py joins and extracts it.
 set -u
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 SRC="$REPO/data/_dynerf_src"

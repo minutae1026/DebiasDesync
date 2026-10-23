@@ -1,17 +1,10 @@
 #!/bin/bash
-# Table 1, 4DGaussians rows: 6 scenes x {baseline, baseline + ours} x RUNS repetitions.
 #
 #   conda activate debiasdesync && bash scripts/train_table1.sh   # all scenes, RUNS=3 (default)
 #   RUNS=4 bash scripts/train_table1.sh          # more repetitions
 #   SCENES="sear_steak" bash scripts/train_table1.sh
 #
-#   baseline : vanilla 4DGaussians (no flags)
-#   dynamic  : + uniform time sampling (--uniform_time_sampling)
-#              + pixel-level weighing, r = 30 (--pixel_weighting --pixel_weighting_ratio 30)
 #
-# Each run: train (coarse 3000 + fine 14000 it, batch 4, half resolution) -> render test view
-# (cam00, 300 frames) -> metrics (PSNR / DyPSNR / DyPSNR-60 into results.json + per_view.json).
-# Completed runs (results.json present) are skipped, so the queue can be restarted.
 set -u
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 GS="$REPO/backbones/4DGaussians"
@@ -35,7 +28,6 @@ fi
 
 OURS_ARGS="--uniform_time_sampling --pixel_weighting --pixel_weighting_ratio 30"
 
-# $1=scene $2=run index $3=tag $4=config  $5...=extra train args
 run_one() {
   local scene=$1 i=$2 tag=$3 cfg=$4; shift 4
   local exp="${scene}_${tag}_${i}"
@@ -63,7 +55,6 @@ run_one() {
   echo "[GIVEUP] ${exp}"
 }
 
-# repetition-major order: an interrupted queue still leaves every cell with the same n
 for i in $(seq 1 $RUNS); do
   echo ""; echo "########## repetition ${i} / ${RUNS} ##########"
   for S in $SCENES; do

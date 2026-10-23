@@ -1,5 +1,4 @@
 #!/bin/bash
-# COLMAP sparse + dense reconstruction from known LLFF poses (4DGaussians recipe).
 #   bash scripts/data/colmap.sh data/dynerf/<scene> llff
 # Requires the `colmap` binary on PATH (e.g. a separate conda env: conda create -n colmap -c conda-forge colmap).
 # PY must be the python of the training environment (needs numpy); default: current `python`.

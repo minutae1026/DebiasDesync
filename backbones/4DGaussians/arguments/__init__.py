@@ -57,8 +57,6 @@ class ModelParams(ParamGroup):
         self.add_points=False
         self.extension=".png"
         self.llffhold=8
-        # Desynchronized capture (dynerf): index of the test camera and the per-camera time
-        # offsets on the global [-1, 1] timeline, set by arguments/dynerf/<scene>.py.
         self.eval_index = 0
         self.gt_delta_time = None
         super().__init__(parser, "Loading Parameters", sentinel)

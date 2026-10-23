@@ -1,14 +1,5 @@
 #!/usr/bin/env python3
-"""Check a desynchronized scene before training. Exit code 1 if anything fails.
-
-  A. frames     cam00 = 300 / train = 200 frames at 1352x1014, PNG integrity, contiguous indices
-  B. mp4        frame count of every mp4 (the loader derives the time axis from it)
-  C. config     gt_delta_time count and values follow the window rule, batch_size = 4
-  D. points     points3D_downsample2.ply exists with a plausible number of points
-  E. masks      cam00 has 300 masks at 1352x1014 with a plausible dynamic-pixel ratio
-  F. loader     the real dataset loader gives train times in [-0.6656, 0.6656], test in [-1, 1],
-                and the per-frame coverage (1-3 views at the ends, all train views in the middle)
-
+"""
     python scripts/data/preflight_scenes.py
     python scripts/data/preflight_scenes.py --scenes flame_steak --verbose
 """
@@ -100,7 +91,6 @@ def check_config(scene: str, d: Path, cams, r: Report):
             r.check(len(gstart) == len(rec) and all(gstart[c] == lay.global_start(c) for c in rec),
                     "C.frames.txt global_start", "consistent with the plan")
         else:
-            # needed only by the Gaussian-Flow loader (4DGaussians takes the offsets from its config)
             print("    NOTE  C.frames.txt has no global_start field; rebuild it with "
                   "build_unsync_scene.py before training Gaussian-Flow")
 
@@ -133,7 +123,6 @@ def check_masks(d: Path, r: Report):
 
 
 def check_loader(scene: str, d: Path, cams, r: Report):
-    """Instantiate the real loader and check the time axis and the coverage profile."""
     try:
         import mmcv
         from scene.neural_3D_dataset_NDC import Neural3D_NDC_Dataset
@@ -164,7 +153,6 @@ def check_loader(scene: str, d: Path, cams, r: Report):
     r.check(len(tr) == (len(cams) - 1) * WINDOW, "F.train sample count",
             f"{len(tr)} (expected {(len(cams)-1)*WINDOW})")
 
-    # global t = local t + offset -> coverage profile
     cov = np.zeros(FULL_FRAMES, dtype=int)
     for t, ci in zip(ds["train"].image_times, ds["train"].image_cam_indices):
         g = float(t) + gt[ci]

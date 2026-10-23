@@ -133,5 +133,4 @@ def safe_state(silent):
 
     sys.stdout = F(silent)
 
-    # The RNG is seeded once in train.py (TRAINING_SEED); do not reseed here.
     torch.cuda.set_device(torch.device("cuda:0"))

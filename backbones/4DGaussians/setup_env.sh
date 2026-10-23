@@ -1,18 +1,10 @@
 #!/bin/bash
-# Build the two CUDA extensions (simple-knn, depth-diff-gaussian-rasterization) inside the
-# conda environment created from environment.yml, and verify that train.py's imports resolve.
 #
 #   conda env create -f backbones/4DGaussians/environment.yml
 #   conda activate debiasdesync
 #   bash backbones/4DGaussians/setup_env.sh
 #
-# Everything is taken from the active environment ($CONDA_PREFIX): nvcc 11.7, gcc 11 and the
-# CUDA headers come from conda, so no system CUDA toolkit is required.
 #
-# Build notes:
-#   - conda's compiler_compat/ld cannot find system libraries -> disabled
-#   - python's sysconfig LDSHARED carries '-Wl,--sysroot=/' which breaks merged-usr layouts -> overridden
-#   - open3d needs libGL -> conda libgl-devel + LD_LIBRARY_PATH (exported via an activate hook)
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -23,7 +15,6 @@ PY="$CONDA_PREFIX/bin/python"
 echo "env: $CONDA_PREFIX"
 "$PY" -c "import torch; print('torch', torch.__version__, '| cuda', torch.version.cuda)"
 
-# Target GPU architecture. Default: the GPU visible right now (e.g. 8.6 for RTX 3090).
 if [ -z "${TORCH_CUDA_ARCH_LIST:-}" ]; then
   TORCH_CUDA_ARCH_LIST="$("$PY" -c "import torch; c=torch.cuda.get_device_capability(0); print(f'{c[0]}.{c[1]}')")"
 fi
@@ -41,7 +32,6 @@ cd "$REPO"
 "$PY" -m pip install -e submodules/simple-knn --no-build-isolation
 "$PY" -m pip install -e submodules/depth-diff-gaussian-rasterization --no-build-isolation
 
-# LD_LIBRARY_PATH / CUDA_HOME on every activation (open3d's libGL, nvcc for later rebuilds)
 mkdir -p "$CONDA_PREFIX/etc/conda/activate.d"
 cat > "$CONDA_PREFIX/etc/conda/activate.d/debiasdesync_env.sh" <<'HOOK'
 export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"

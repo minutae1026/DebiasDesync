@@ -262,7 +262,6 @@ class Neural3D_NDC_Dataset(Dataset):
         poses_arr = np.load(os.path.join(self.root_dir, "poses_bounds.npy"))
         poses = poses_arr[:, :-2].reshape([-1, 3, 5])  # (N_cams, 3, 5)
         self.near_fars = poses_arr[:, -2:]
-        # only the videos: the extracted frame folders cam*/ live next to them
         videos = glob.glob(os.path.join(self.root_dir, "cam*.mp4"))
         videos = sorted(videos)
         # breakpoint()
@@ -306,9 +305,6 @@ class Neural3D_NDC_Dataset(Dataset):
         image_paths = []
         image_poses = []
         image_times = []
-        # Desynchronized capture: <scene>_frames.txt (written by scripts/data/build_unsync_scene.py)
-        # gives every training camera its window start s and its global_start (s plus the
-        # correction of cameras that are desynchronized in the original capture).
         self._cam_start = {}
         import re as _re
         _ftxt = os.path.join(self.root_dir, os.path.basename(self.root_dir.rstrip('/')) + "_frames.txt")
@@ -367,7 +363,6 @@ class Neural3D_NDC_Dataset(Dataset):
                 R = -R
                 R[:,0] = -R[:,0]
                 T = -pose[:3,3].dot(R)
-                # local frame j -> global frame global_start + j (normalized later in GaussianModel.set_timestamp)
                 _s = self._cam_start.get(_cam_name, 0)
                 image_times.append(float(_s + idx))
                 image_poses.append((R,T))
@@ -380,7 +375,6 @@ class Neural3D_NDC_Dataset(Dataset):
                 #     video_data_save[count] = img.permute(1,2,0)
                 #     count += 1
                 
-        # Upstream keeps every 10th test frame; the evaluation uses all 300 frames of cam00.
         if split == "test" and getattr(self, "subsample_test", False):
             image_paths = image_paths[::10]
             image_poses = image_poses[::10]

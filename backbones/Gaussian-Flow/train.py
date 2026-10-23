@@ -44,9 +44,6 @@ import taichi as ti
 ti.init(arch=ti.cuda, offline_cache=False)
 
 
-# Taichi (DDDM) allocates from its own CUDA pool, outside PyTorch's caching allocator, so
-# PyTorch is capped at a fraction of the device memory and its cache is released periodically
-# (see the training loop).
 _VRAM_FRACTION = float(os.environ.get("OURS_TORCH_VRAM_FRACTION", "0.90"))
 
 def reserve_vram_for_taichi():
@@ -158,7 +155,6 @@ def training(dataset, opt, pipe, flow_args, testing_iterations, saving_iteration
                 viewpoint_stack = scene.getTrainCameras()
             batch_size = opt.batch_size
             if opt.dataloader:
-                # Uniform sampling across time (Sec. 3.1)
                 _sampler = None
                 if getattr(opt, "uniform_t", False):
                     _inner = getattr(viewpoint_stack, "dataset", viewpoint_stack)
@@ -250,7 +246,6 @@ def training(dataset, opt, pipe, flow_args, testing_iterations, saving_iteration
         gt_images = torch.stack(gt_images)    
         
 
-        # Pixel-level weighing (Sec. 3.2); the exponent ramps linearly from 0 to 1 over pw_warmup_iters
         if getattr(opt, "use_pixel_weighting", False):
             _ramp = min(1.0, iteration / float(max(1, getattr(opt, "pw_warmup_iters", 1000))))
             Ll1, _ = calc_pixel_weights(
@@ -398,8 +393,6 @@ def training(dataset, opt, pipe, flow_args, testing_iterations, saving_iteration
                 #     gaussians.save_t0(scene.model_path.replace(frame_id, ''))
                 # else:
                 #     gaussians.save_diff(scene.model_path.replace(frame_id, ''))
-        # Return PyTorch's cached blocks to the driver so that Taichi's pool can grow
-        # (see reserve_vram_for_taichi).
         if iteration % 500 == 0:
             torch.cuda.empty_cache()
     print("\n[ITER {}] Saving Checkpoint".format(iteration))

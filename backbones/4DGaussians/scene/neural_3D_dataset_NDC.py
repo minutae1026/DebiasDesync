@@ -285,7 +285,6 @@ class Neural3D_NDC_Dataset(Dataset):
         eval_video_images_path = eval_video_path.split('.')[0]
         eval_image_path = os.path.join(eval_video_images_path, "images")
 
-        # number of frames of the test camera = length of the global timeline
         if os.path.exists(eval_image_path):
             eval_images = os.listdir(eval_image_path)
             eval_frame_count = len(eval_images)
@@ -312,7 +311,6 @@ class Neural3D_NDC_Dataset(Dataset):
             if os.path.exists(image_path):
                 existing_image_count = len(os.listdir(image_path))
             
-            # extract the frames that are not on disk yet
             if existing_image_count < countss:
                 if existing_image_count == 0:
                     print(f"no images saved in {image_path}, extract images from video.")
@@ -355,7 +353,6 @@ class Neural3D_NDC_Dataset(Dataset):
                 path = images_path[idx]
                 image_paths.append(os.path.join(image_path,path))
                 
-                # train cameras: local time scaled to the global timeline (the camera's offset is added at render time)
                 if split == "train":
                     image_times.append((2*(idx / (countss-1)) -1) * ((countss-1) / (eval_frame_count-1)))
                 else:

@@ -1,28 +1,7 @@
 #!/usr/bin/env python3
-"""Turn a Neural 3D Video scene into the desynchronized setting used in the paper.
-
-    test view    cam00 keeps the full F-frame timeline (F = 300)
-    train views  every other camera keeps a contiguous T-frame window [s, s+T-1] (T = 200)
-    starts       the first camera gets s = 0 and the second s = F-T, so the whole timeline
-                 is covered; the others draw s from [0, F-T-1] without repetition
-    assignment   camera ids are shuffled before being paired with the starts, so cameras
-                 covering the same times are not spatially adjacent
-    offset       global time offset of a camera on the [-1, 1] axis:
-                 (2s + T - F) / (F - 1)  ==  (s - (F-T)/2) * 2 / (F-1)
-    seed         777 (random.Random)
-
-A source video longer than F frames (flame_salmon_1 has 1200) is cut to its first F frames,
-the standard 10 s x 30 fps protocol of the dataset.
-
-Training frames. By default the PNGs are decoded from the source video and the trimmed mp4
-is re-encoded afterwards from them (scripts/data/make_trimmed_videos.py). With --legacy_trim
-(used for coffee_martini, cook_spinach and sear_steak) the source mp4 is cut to the window
-first and the PNGs are decoded from the cut video.
-
+"""
     python scripts/data/build_unsync_scene.py --scene flame_steak
     python scripts/data/build_unsync_scene.py --scene cook_spinach --verify
-
-COLMAP, the point cloud and the dynamic masks are produced afterwards by scripts/data/build_scenes.sh.
 """
 from __future__ import annotations
 
@@ -44,15 +23,11 @@ ROOT = Path(__file__).resolve().parents[2]
 CFG_DIR = ROOT / "backbones" / "4DGaussians" / "arguments" / "dynerf"
 
 TEST_CAM = "cam00"
-# The source videos are 2704x2028; the 4DGaussians loader works at 1352x1014 (downsample 2),
-# which is also what llff2colmap.py and the dynamic masks assume.
 IMG_WH = (1352, 1014)
 FULL_FRAMES = 300      # length F of the common timeline
 WINDOW = 200           # window length T of every training camera
 SEED = 777
 
-# Cameras that are desynchronized in the original capture: the global time of their window
-# is shifted by this many frames.
 KNOWN_MISALIGNED = {("coffee_martini", "cam13"): 45}
 
 FRAME_RE = re.compile(r"\d+\.png$")
@@ -61,19 +36,16 @@ WINDOW_RE = re.compile(r"(cam\d+): \[(\d+), (\d+)\]")
 
 @dataclass(frozen=True)
 class Layout:
-    """Window assignment of one scene."""
     scene: str
-    cams: list          # all cameras including cam00, sorted by name
-    starts: dict        # train camera -> window start frame
+    cams: list
+    starts: dict
     full: int
     window: int
 
     def global_start(self, cam: str) -> int:
-        """Global frame of the camera's first kept frame (window start + known misalignment)."""
         return self.starts[cam] + KNOWN_MISALIGNED.get((self.scene, cam), 0)
 
     def offset(self, cam: str) -> float:
-        """Time offset of a train camera on the global [-1, 1] axis."""
         s = self.global_start(cam)
         return (2 * s + self.window - self.full) / (self.full - 1)
 
@@ -84,7 +56,6 @@ class Layout:
 
 def plan(scene: str, cams: list, full: int = FULL_FRAMES,
          window: int = WINDOW, seed: int = SEED) -> Layout:
-    """Draw the window starts and assign them to the train cameras (deterministic)."""
     train = [c for c in cams if c != TEST_CAM]
     bound = full - window
     rng = random.Random(seed)
@@ -119,7 +90,6 @@ def frames_of(cam_dir: Path) -> list:
 
 
 def extract(scene_dir: Path, cam: str, n: int) -> int:
-    """Write the first n frames of <cam>.mp4 to <cam>/images/0000.png ... (skipped if present)."""
     out = scene_dir / cam / "images"
     have = frames_of(scene_dir / cam)
     if len(have) >= n:
@@ -131,7 +101,6 @@ def extract(scene_dir: Path, cam: str, n: int) -> int:
         ok, frame = cap.read()
         if not ok:
             break
-        # same path as the 4DGaussians loader: BGR -> RGB -> PIL -> LANCZOS resize
         img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
         if img.size != IMG_WH:
             img = img.resize(IMG_WH, Image.LANCZOS)
@@ -142,7 +111,6 @@ def extract(scene_dir: Path, cam: str, n: int) -> int:
 
 
 def trim(scene_dir: Path, cam: str, start: int, window: int) -> bool:
-    """Keep frames [start, start+window-1] and renumber them from 0000. False if already trimmed."""
     names = frames_of(scene_dir / cam)
     if len(names) == window:
         return False
@@ -189,10 +157,6 @@ def _bitrate_kbps(exe: str, path: Path) -> int:
 
 
 def trim_video(scene_dir: Path, cam: str, start: int, window: int, full: int) -> bool:
-    """Cut <cam>.mp4 to frames [start, start+window-1] at full resolution
-    (libx264, preset medium, yuv420p, 30 fps, bitrate = source x window/full).
-    False if the video already has window frames.
-    """
     src = scene_dir / f"{cam}.mp4"
     if _video_frames(src) == window:
         return False
@@ -238,9 +202,6 @@ def render_config(lay: Layout) -> str:
 
 
 def render_frames_txt(lay: Layout) -> str:
-    """One line per train camera: the kept source frames [s, s+T-1] and the global frame of
-    the first kept frame (differs from s only for known-misaligned cameras). The Gaussian-Flow
-    loader reads global_start; the 4DGaussians configs carry the same information as offsets."""
     return "".join(f"{c}: [{lo}, {hi}], {lay.window} frames, global_start {lay.global_start(c)}\n"
                    for c in lay.starts for lo, hi in [lay.span(c)])
 
@@ -253,7 +214,6 @@ def describe(lay: Layout) -> None:
 
 
 def verify(scene: str, root: Path) -> bool:
-    """Check that <scene>_frames.txt and arguments/dynerf/<scene>.py agree with the plan."""
     txt = (root / scene / f"{scene}_frames.txt").read_text()
     recorded = {m[0]: int(m[1]) for m in WINDOW_RE.findall(txt)}
     cfg = CFG_DIR / f"{scene}.py"
@@ -290,7 +250,6 @@ def build(scene: str, root: Path, full: int, window: int, legacy: bool = False) 
     describe(lay)
 
     if legacy:
-        # cut the source video first, then decode the training frames from the cut video
         for cam in sorted(lay.starts):
             did = trim_video(scene_dir, cam, lay.starts[cam], window, full)
             print(f"  [trim mp4] {cam} -> {window} frames{'' if did else ' (already trimmed)'}", flush=True)
@@ -314,8 +273,6 @@ def build(scene: str, root: Path, full: int, window: int, legacy: bool = False) 
 
     (scene_dir / f"{scene}_frames.txt").write_text(render_frames_txt(lay))
     print(f"  [write] {scene_dir / f'{scene}_frames.txt'}")
-    # Shipped configs are never overwritten; an existing config must agree with the plan,
-    # otherwise the trainer would use offsets that do not match the frames on disk.
     cfg = CFG_DIR / f"{scene}.py"
     if cfg.is_file():
         if not verify(scene, root):

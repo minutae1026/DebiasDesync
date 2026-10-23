@@ -1,14 +1,6 @@
 #!/usr/bin/env python3
-"""Check the extracted frames and repair broken ones from the source mp4.
-
-Checks: the PNG opens (an interrupted write leaves a truncated file), its size is
-1352x1014, and every camera has the right number of frames (cam00 = 300, train = 200).
-
-Repair: train cameras are already trimmed to [s, s+199] and renumbered, so local frame j
-is global frame s + j. The window start s comes from build_unsync_scene.plan() and the
-frame is re-extracted the same way (BGR -> RGB -> LANCZOS).
-
-    python scripts/data/verify_frames.py                       # all scenes, check + repair
+"""
+    python scripts/data/verify_frames.py
     python scripts/data/verify_frames.py --scenes flame_steak
     python scripts/data/verify_frames.py --check_only
 """
@@ -31,10 +23,6 @@ PNG_SIG = b"\x89PNG\r\n\x1a\n"
 
 
 def bad_reason(path: Path, deep: bool = False):
-    """Reason the file is broken, or None.
-
-    Only the PNG header and the IEND tail are read by default; --deep also decodes the pixels.
-    """
     try:
         with open(path, "rb") as fh:
             head = fh.read(33)
@@ -64,7 +52,7 @@ def global_index(scene_dir: Path, scene: str, cam: str, local: int) -> int:
     cap = cv2.VideoCapture(str(scene_dir / f"{cam}.mp4"))
     n = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     cap.release()
-    if n == WINDOW:          # the mp4 is already cut to the window (legacy or re-encoded)
+    if n == WINDOW:
         return local
     lay = plan(scene, list_cams(scene_dir))
     return lay.starts[cam] + local

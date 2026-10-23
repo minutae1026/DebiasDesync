@@ -5,11 +5,6 @@ __all__ = ["UniformTSampler"]
 
 
 class UniformTSampler(Sampler):
-    """Frame-level uniform sampling across time (Sec. 3.1) for the Gaussian-Flow backbone.
-
-    A time step is drawn uniformly among the steps that have at least one view, then one
-    of its views uniformly. Draws are with replacement and never end.
-    """
 
     def __init__(self, times, frame_count=300, seed=6666):
         super().__init__(None)

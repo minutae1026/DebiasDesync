@@ -74,25 +74,6 @@ def calc_pixel_weights(
     eps: float = 1e-8,
     soft_mining_alpha: float = 1.0,
 ):
-    """Pixel-level weighing of the L1 reconstruction loss (Sec. 3.2, Eqs. 4-6).
-
-    For every image in the batch, with per-pixel error err_x = mean_c |I_hat(x) - I(x)|
-    and N = H * W pixels:
-
-        w_x = N * softmax_x(lambda * err_hat_x) ** alpha,   lambda = log(r),
-        err_hat_x = (err_x - min err) / (max err - min err),
-        L = (1 / N) * sum_x sg(w_x) * err_x
-
-    The weights are computed without gradient (stop-gradient) and are normalized within
-    each image, so mean_x w_x = 1 and the loss scale of the plain L1 is preserved.
-    r = pixel_weighting_ratio sets the ratio between the largest and smallest weight;
-    alpha = 1 is the full weighing and alpha = 0 recovers the unweighted L1 (used for the
-    linear warm-up in train.py).
-
-    Returns:
-        pixel_weighted_l1: [B] weighted loss of every image
-        pixel_weights: [B, 1, H, W] weight maps
-    """
     per_pixel_l1 = torch.abs(image_tensor - gt_image_tensor[:, :3, :, :]).mean(dim=1)  # [B,H,W]
     pixel_num = per_pixel_l1.shape[1] * per_pixel_l1.shape[2]
 

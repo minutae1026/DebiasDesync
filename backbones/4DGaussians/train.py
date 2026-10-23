@@ -97,7 +97,6 @@ def scene_reconstruction(dataset, opt, hyper, pipe, testing_iterations, saving_i
     if opt.dataloader:
         viewpoint_stack = scene.getTrainCameras()
         setup_seed(TRAINING_SEED)
-        # Uniform sampling across time (Sec. 3.1), fine stage only
         if args.uniform_time_sampling and stage == "fine":
             gt_delta_time = scene.train_camera.dataset.gt_delta_time
             sampler = UniformTimeSampler(viewpoint_stack, frame_count=300,
@@ -212,8 +211,6 @@ def scene_reconstruction(dataset, opt, hyper, pipe, testing_iterations, saving_i
         image_tensor = torch.cat(images,0)
         gt_image_tensor = torch.cat(gt_images,0)
 
-        # Loss: pixel-level weighing (Sec. 3.2), fine stage only; the exponent ramps
-        # linearly from 0 to 1 over pixel_weighting_warmup iterations
         if args.pixel_weighting and stage == "fine":
             warmup = args.pixel_weighting_warmup
             alpha = min(1.0, iteration / float(warmup)) if warmup > 0 else 1.0
@@ -402,7 +399,6 @@ if __name__ == "__main__":
     parser.add_argument("--start_checkpoint", type=str, default = None)
     parser.add_argument("--expname", type=str, default = "")
     parser.add_argument("--configs", type=str, default = "")
-    # Our training strategy. Both off = the original 4DGaussians training.
     parser.add_argument("--uniform_time_sampling", action="store_true",
                         help="frame-level uniform sampling across time (Sec. 3.1)")
     parser.add_argument("--pixel_weighting", action="store_true",

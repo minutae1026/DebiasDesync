@@ -1,4 +1,3 @@
-# pip packages of the 4DGaussians environment.
 # torch / torchvision are pinned in environment.yml (cu117 wheels).
 mmcv==1.6.0
 numpy==1.21.6
